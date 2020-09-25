@@ -8,7 +8,7 @@ namespace cbtesttest
         [Fact]
         public void Test1()
         {
-            Assert.Equal("a", "b");
+            Assert.Equal("a", "a");
         }
     }
 }
