@@ -1,0 +1,29 @@
+version: '3.6'
+
+services:
+  build_container: 
+    build:
+        target: build
+        dockerfile: ./cbtest/Dockerfile
+        context: ..
+    command: bash -c 'while !</dev/tcp/db/5432; do sleep 1; done; chmod +x /run_tests.bash; /run_tests.bash'
+    depends_on:
+      - db
+    #environment:
+      #- DATABASE_URL=postgres://postgres:password@db:5439/agreements_database
+      #- PORT=3000
+
+  runtime_container:
+    build:
+        target: final
+        dockerfile: ./cbtest/Dockerfile
+        context: ..
+    entrypoint: bash -c 'pwd'
+
+  db:
+    image: postgres
+    ports: 
+      - 5455:5432
+    environment:
+      - POSTGRES_DB=agreements_database
+      - POSTGRES_HOST_AUTH_METHOD=trust

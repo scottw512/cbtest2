@@ -1,0 +1,26 @@
+version: 0.2
+
+phases:
+  install:
+    runtime-versions:
+      docker: 18
+  
+  pre_build:
+    commands:
+      - echo Logging in to Amazon ECR...
+      - eval $(aws ecr get-login --no-include-email --region us-west-1)
+
+  build:
+    commands:			 
+       #- docker build -f ./Dockerfile -t cbtest:56 .
+       - docker-compose -f ./cbtest/docker-compose.yml build
+       - docker-compose -f ./cbtest/docker-compose.yml up --exit-code-from build_container build_container
+       - docker tag cbtest_runtime_container:latest cbtest:56
+
+       - echo Build completed on `date`
+  
+  post_build:
+    commands:
+      - echo Pushing the Docker image...       
+      - docker tag cbtest:56 511674593789.dkr.ecr.us-west-1.amazonaws.com/cbtest-api:56
+      - docker push 511674593789.dkr.ecr.us-west-1.amazonaws.com/cbtest-api:56
